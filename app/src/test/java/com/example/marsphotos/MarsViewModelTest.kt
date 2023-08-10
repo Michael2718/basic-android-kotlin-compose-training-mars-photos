@@ -3,8 +3,8 @@ package com.example.marsphotos
 import com.example.marsphotos.fake.FakeDataSource
 import com.example.marsphotos.fake.FakeNetworkMarsPhotosRepository
 import com.example.marsphotos.rules.TestDispatcherRule
-import com.example.marsphotos.ui.screens.RequestStatus
-import com.example.marsphotos.ui.screens.MarsViewModel
+import com.example.marsphotos.ui.RequestStatus
+import com.example.marsphotos.ui.MarsViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.Assert.assertEquals

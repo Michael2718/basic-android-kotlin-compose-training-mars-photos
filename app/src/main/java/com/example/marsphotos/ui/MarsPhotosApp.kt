@@ -53,7 +53,6 @@ import coil.request.ImageRequest
 import com.example.marsphotos.R
 import com.example.marsphotos.network.MarsPhoto
 import com.example.marsphotos.ui.screens.HomeScreen
-import com.example.marsphotos.ui.screens.MarsViewModel
 import com.example.marsphotos.ui.screens.PhotoScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
