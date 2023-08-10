@@ -15,9 +15,6 @@
  */
 package com.example.marsphotos.ui.screens
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -26,24 +23,33 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.marsphotos.MarsPhotosApplication
 import com.example.marsphotos.data.MarsPhotosRepository
-import com.example.marsphotos.model.MarsPhoto
+import com.example.marsphotos.network.MarsPhoto
+import com.example.marsphotos.ui.MarsUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-/**
- * UI state for the Home screen
- */
-sealed interface MarsUiState {
-    data class Success(val photos: List<MarsPhoto>) : MarsUiState
-    object Error : MarsUiState
-    object Loading : MarsUiState
+sealed interface RequestStatus {
+    data class Success(val photos: List<MarsPhoto>) : RequestStatus
+    object Error : RequestStatus
+    object Loading : RequestStatus
 }
 
-class MarsViewModel(private val marsPhotosRepository: MarsPhotosRepository) : ViewModel() {
-    /** The mutable State that stores the status of the most recent request */
-    var marsUiState: MarsUiState by mutableStateOf(MarsUiState.Loading)
-        private set
+class MarsViewModel(
+    private val marsPhotosRepository: MarsPhotosRepository
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(
+        MarsUiState(
+            requestStatus = RequestStatus.Loading,
+            currentPhoto = null
+        )
+    )
+    val uiState: StateFlow<MarsUiState> =_uiState
+//    var marsUiState: RequestStatus by mutableStateOf(RequestStatus.Loading)
+//        private set
 
     /**
      * Call getMarsPhotos() on init so we can display status immediately.
@@ -58,20 +64,28 @@ class MarsViewModel(private val marsPhotosRepository: MarsPhotosRepository) : Vi
      */
     fun getMarsPhotos() {
         viewModelScope.launch {
-            marsUiState = MarsUiState.Loading
-            marsUiState = try {
-                MarsUiState.Success(marsPhotosRepository.getMarsPhotos())
-            } catch (e: IOException) {
-                MarsUiState.Error
-            } catch (e: HttpException) {
-                MarsUiState.Error
+            _uiState.update {
+                it.copy(
+                    requestStatus = try {
+                        RequestStatus.Success(marsPhotosRepository.getMarsPhotos())
+                    } catch (e: IOException) {
+                        RequestStatus.Error
+                    } catch (e: HttpException) {
+                        RequestStatus.Error
+                    }
+                )
             }
         }
     }
 
-    /**
-     * Factory for [MarsViewModel] that takes [MarsPhotosRepository] as a dependency
-     */
+    fun updateCurrentPhoto(currentPhoto: MarsPhoto) {
+        _uiState.update {
+            it.copy(
+                currentPhoto = currentPhoto
+            )
+        }
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
