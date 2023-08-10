@@ -102,7 +102,7 @@ fun MarsPhotosApp(
         ) {
             composable(MarsPhotosScreen.Start.name) {
                 HomeScreen(
-                    marsUiState = uiState.requestStatus,
+                    requestStatus = uiState.requestStatus,
                     retryAction = viewModel::getMarsPhotos,
                     onItemClick = {
                         navController.navigate(MarsPhotosScreen.Photo.name)
@@ -117,6 +117,7 @@ fun MarsPhotosApp(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MarsTopAppBar(
     currentScreen: MarsPhotosScreen,

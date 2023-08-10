@@ -51,15 +51,15 @@ import com.example.marsphotos.ui.theme.MarsPhotosTheme
 
 @Composable
 fun HomeScreen(
-    marsUiState: RequestStatus,
+    requestStatus: RequestStatus,
     retryAction: () -> Unit,
     onItemClick: (MarsPhoto) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    when (marsUiState) {
+    when (requestStatus) {
         is RequestStatus.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is RequestStatus.Success -> PhotosGridScreen(
-            marsUiState.photos,
+            requestStatus.photos,
             onItemClick = onItemClick,
             modifier.fillMaxWidth()
         )
